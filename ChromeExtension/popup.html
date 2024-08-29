@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Local Web App Security Tester</title>
+  <style>
+    body { width: 300px; padding: 10px; font-family: Arial, sans-serif; }
+    button { display: block; width: 100%; margin-bottom: 10px; padding: 5px; }
+  </style>
+</head>
+<body>
+  <h2>Simulate Attacks</h2>
+  <button id="xss">Simulate XSS</button>
+  <button id="dom-xss">Simulate DOM-based XSS</button>
+  <button id="clickjacking">Simulate Clickjacking</button>
+  <button id="csrf">Simulate CSRF</button>
+  <button id="idor">Simulate IDOR</button>
+  <button id="open-redirect">Simulate Open Redirect</button>
+  <button id="local-storage">Simulate Local Storage Manipulation</button>
+  <button id="dom-size">Simulate Excessive DOM Size</button>
+  <script src="popup.js"></script>
+</body>
+</html>

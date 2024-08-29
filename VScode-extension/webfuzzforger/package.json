@@ -1,0 +1,57 @@
+{
+  "name": "webfuzzforger",
+  "displayName": "WebFuzzForger",
+  "description": "Web Fuzz Forger VS code extension",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.92.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [],
+  "main": "./extension.js",
+  "contributes": {
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "webFuzzForgerView",
+          "title": "WebFuzzForger",
+          "icon": "resources/icon.png"
+        }
+      ]
+    },
+    "views": {
+      "webFuzzForgerView": [
+        {
+          "id": "webFuzzForgerView",
+          "name": "WebFuzzForger"
+        }
+      ]
+    },
+    "commands": [
+      {
+        "command": "webFuzzForger.openWebview",
+        "title": "Open WebFuzzForger"
+      }
+    ]
+  },
+  "scripts": {
+    "lint": "eslint .",
+    "pretest": "npm run lint",
+    "test": "vscode-test"
+  },
+  "devDependencies": {
+    "@types/mocha": "^10.0.7",
+    "@types/node": "20.x",
+    "@types/vscode": "^1.92.0",
+    "@vscode/test-cli": "^0.0.9",
+    "@vscode/test-electron": "^2.4.0",
+    "eslint": "^8.57.0",
+    "typescript": "^5.4.5"
+  },
+  "dependencies": {
+    "chokidar": "^3.6.0",
+    "dependency-check": "^4.1.0"
+  }
+}
