@@ -2,6 +2,18 @@
 
 Cheetah hi kehde
 
+## Full Working Text Editor (Only editor, not compiler/interpretor)
+
+1. **Use Yarn**
+   - yarn tauri build 
+   - yarn tauri dev
+
+2. **Prerequisites**
+   - rust
+   - visual studio build tools
+   - tauri
+
+
 ## Chrome Extension: Local Web App Security Tester (8 kinds of client side attacks simulation- all working for now)
 
 1. **Cross-Site Scripting (XSS) Simulation**
