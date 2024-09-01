@@ -10,6 +10,7 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "@webfuzzforge/core": "^1.0.0",
     "dns": "^0.2.2"
   }
 }

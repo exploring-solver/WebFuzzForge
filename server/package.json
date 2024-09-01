@@ -1,5 +1,5 @@
 {
-  "name": "parameter-fuzzer",
+  "name": "server",
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
@@ -10,6 +10,7 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
-    "@webfuzzforge/core": "^1.0.0"
+    "cors": "^2.8.5",
+    "express": "^4.19.2"
   }
 }

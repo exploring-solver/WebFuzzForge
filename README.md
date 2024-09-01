@@ -1,6 +1,7 @@
 # Out of retirement
 
 Cheetah hi kehde
+Sherr!!
 
 ## Full Working Text Editor (Only editor, not compiler/interpretor)
 
