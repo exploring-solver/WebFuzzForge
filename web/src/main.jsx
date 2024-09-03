@@ -6,6 +6,6 @@ import WebFuzzForgeDashboard from './components/WebFuzzForgeDashboard.jsx'
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    <WebFuzzForgeDashboard />
+    <App />
   </StrictMode>,
 )

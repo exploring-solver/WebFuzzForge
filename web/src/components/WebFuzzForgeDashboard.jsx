@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 
 const WebFuzzForgeDashboard = () => {
-  const [baseUrl, setBaseUrl] = useState('http://localhost:3000');
+  const backendUrl = import.meta.env.VITE_BACKEND_URL;
+  const [baseUrl, setBaseUrl] = useState(backendUrl);
   const [results, setResults] = useState({});
   const [loading, setLoading] = useState(false);
   const [activeTab, setActiveTab] = useState('directoryFuzzer');
@@ -19,7 +20,7 @@ const WebFuzzForgeDashboard = () => {
   const runFuzzer = async (fuzzerName, endpoint) => {
     setLoading(true);
     try {
-      const response = await fetch(`http://localhost:3000/${endpoint}`, {
+      const response = await fetch(`${backendUrl}/${endpoint}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -163,7 +164,7 @@ const WebFuzzForgeDashboard = () => {
         placeholder="Enter base URL"
         className="w-full p-2 mb-4 border rounded"
       />
-      <div className="mb-4">
+      <div className="mb-4 flex ">
         <button onClick={() => setActiveTab('directoryFuzzer')} className={`mr-2 p-2 ${activeTab === 'directoryFuzzer' ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}>Directory Fuzzer</button>
         <button onClick={() => setActiveTab('apiFuzzer')} className={`mr-2 p-2 ${activeTab === 'apiFuzzer' ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}>API Fuzzer</button>
         <button onClick={() => setActiveTab('parameterFuzzer')} className={`mr-2 p-2 ${activeTab === 'parameterFuzzer' ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}>Parameter Fuzzer</button>
