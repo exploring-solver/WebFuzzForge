@@ -9,7 +9,7 @@ const VHostDiscovery = require('../packages/vhost-discovery');
 const authControllers = require('./controllers/Auth.Controllers');
 const authMiddleware = require('./middlewares/auth');
 const ReportGenerator = require('./controllers/Report.controller');
-
+const testSiteControllers = require('./controllers/TestSite.controllers');
 const app = express();
 app.use(cors());
 app.use(express.json());
@@ -87,6 +87,8 @@ app.get('/report/:id', authMiddleware, async (req, res) => {
     res.status(500).json({ error: 'Error fetching report' });
   }
 });
-
+app.post('/test-sites', authMiddleware, testSiteControllers.addTestSite);
+app.get('/test-sites', authMiddleware, testSiteControllers.getTestSites);
+app.delete('/test-sites/:id', authMiddleware, testSiteControllers.deleteTestSite);
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

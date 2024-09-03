@@ -24,10 +24,13 @@ import {
   Public,
   Help,
   Assignment,
+  Remove,
+  Add,
 } from '@mui/icons-material';
 import Navbar from './Navbar';
-import ReportList from './ReportList';
-import ReportsList from './ReportList';
+import ReportList from './reports/ReportList';
+import ReportsList from './reports/ReportList';
+import TestSiteManager from './dashboard/TestSiteManager';
 
 const drawerWidth = 240;
 
@@ -56,7 +59,7 @@ const WebFuzzForgeDashboard = ({ token, setToken }) => {
   const [results, setResults] = useState({});
   const [loading, setLoading] = useState(false);
   const [activeTab, setActiveTab] = useState('directoryFuzzer');
-
+  const [selectedTestSite, setSelectedTestSite] = useState(null);
   // State for user inputs
   const [directories, setDirectories] = useState(['admin', 'config', 'backup', 'test']);
   const [apiEndpoints, setApiEndpoints] = useState(['/api/v1/users', '/api/v1/products']);
@@ -102,7 +105,13 @@ const WebFuzzForgeDashboard = ({ token, setToken }) => {
         return { baseUrl };
     }
   };
-
+  const toolInfo = {
+    directoryFuzzer: "Scans for hidden directories on the target website",
+    apiFuzzer: "Tests various API endpoints with different HTTP methods",
+    parameterFuzzer: "Fuzzes parameters with payloads to find vulnerabilities",
+    subdomainDiscovery: "Discovers subdomains of the target domain",
+    vhostDiscovery: "Identifies virtual hosts on the target server",
+  };
   const renderResults = (fuzzerName) => {
     const fuzzerResults = results[fuzzerName];
     if (!fuzzerResults) return null;
@@ -118,35 +127,60 @@ const WebFuzzForgeDashboard = ({ token, setToken }) => {
     );
   };
 
+  const handleAddInput = (stateSetter, currentState) => {
+    stateSetter([...currentState, '']);
+  };
+
+  const handleRemoveInput = (stateSetter, currentState, index) => {
+    const newState = [...currentState];
+    newState.splice(index, 1);
+    stateSetter(newState);
+  };
+
+  const handleInputChange = (stateSetter, currentState, index, value) => {
+    const newState = [...currentState];
+    newState[index] = value;
+    stateSetter(newState);
+  };
+
   const renderInputs = () => {
+    const renderInputGroup = (label, state, stateSetter) => (
+      <>
+        <Typography variant="subtitle1">{label}</Typography>
+        {state.map((value, index) => (
+          <Grid container spacing={2} key={index} alignItems="center">
+            <Grid item xs={10}>
+              <TextField
+                fullWidth
+                value={value}
+                onChange={(e) => handleInputChange(stateSetter, state, index, e.target.value)}
+                margin="normal"
+              />
+            </Grid>
+            <Grid item xs={2}>
+              <IconButton onClick={() => handleRemoveInput(stateSetter, state, index)}>
+                <Remove />
+              </IconButton>
+            </Grid>
+          </Grid>
+        ))}
+        <Button
+          startIcon={<Add />}
+          onClick={() => handleAddInput(stateSetter, state)}
+        >
+          Add {label}
+        </Button>
+      </>
+    );
+
     switch (activeTab) {
       case 'directoryFuzzer':
-        return (
-          <TextField
-            fullWidth
-            label="Directories to Fuzz"
-            value={directories.join(', ')}
-            onChange={(e) => setDirectories(e.target.value.split(', '))}
-            margin="normal"
-          />
-        );
+        return renderInputGroup("Directories to Fuzz", directories, setDirectories);
       case 'apiFuzzer':
         return (
           <>
-            <TextField
-              fullWidth
-              label="API Endpoints"
-              value={apiEndpoints.join(', ')}
-              onChange={(e) => setApiEndpoints(e.target.value.split(', '))}
-              margin="normal"
-            />
-            <TextField
-              fullWidth
-              label="HTTP Methods"
-              value={apiMethods.join(', ')}
-              onChange={(e) => setApiMethods(e.target.value.split(', '))}
-              margin="normal"
-            />
+            {renderInputGroup("API Endpoints", apiEndpoints, setApiEndpoints)}
+            {renderInputGroup("HTTP Methods", apiMethods, setApiMethods)}
           </>
         );
       case 'parameterFuzzer':
@@ -159,57 +193,26 @@ const WebFuzzForgeDashboard = ({ token, setToken }) => {
               onChange={(e) => setParamEndpoint(e.target.value)}
               margin="normal"
             />
-            <TextField
-              fullWidth
-              label="Parameters"
-              value={parameters.join(', ')}
-              onChange={(e) => setParameters(e.target.value.split(', '))}
-              margin="normal"
-            />
-            <TextField
-              fullWidth
-              label="Payloads"
-              value={payloads.join(', ')}
-              onChange={(e) => setPayloads(e.target.value.split(', '))}
-              margin="normal"
-            />
+            {renderInputGroup("Parameters", parameters, setParameters)}
+            {renderInputGroup("Payloads", payloads, setPayloads)}
           </>
         );
       case 'subdomainDiscovery':
-        return (
-          <TextField
-            fullWidth
-            label="Subdomains to Check"
-            value={subdomains.join(', ')}
-            onChange={(e) => setSubdomains(e.target.value.split(', '))}
-            margin="normal"
-          />
-        );
+        return renderInputGroup("Subdomains to Check", subdomains, setSubdomains);
       case 'vhostDiscovery':
-        return (
-          <TextField
-            fullWidth
-            label="VHosts to Check"
-            value={vhosts.join(', ')}
-            onChange={(e) => setVhosts(e.target.value.split(', '))}
-            margin="normal"
-          />
-        );
+        return renderInputGroup("VHosts to Check", vhosts, setVhosts);
       default:
         return null;
     }
   };
 
-  const toolInfo = {
-    directoryFuzzer: "Scans for hidden directories on the target website",
-    apiFuzzer: "Tests various API endpoints with different HTTP methods",
-    parameterFuzzer: "Fuzzes parameters with payloads to find vulnerabilities",
-    subdomainDiscovery: "Discovers subdomains of the target domain",
-    vhostDiscovery: "Identifies virtual hosts on the target server",
-  };
   const renderContent = () => {
     if (activeTab === 'reports') {
       return <ReportList token={token} />;
+    }
+
+    if (activeTab === 'testSites') {
+      return <TestSiteManager token={token} onSelectTestSite={setSelectedTestSite} />;
     }
 
     return (
@@ -219,7 +222,7 @@ const WebFuzzForgeDashboard = ({ token, setToken }) => {
             <TextField
               fullWidth
               label="Base URL"
-              value={baseUrl}
+              value={selectedTestSite ? selectedTestSite.url : baseUrl}
               onChange={(e) => setBaseUrl(e.target.value)}
             />
           </Grid>
@@ -265,7 +268,7 @@ const WebFuzzForgeDashboard = ({ token, setToken }) => {
       >
         <Toolbar />
         <List>
-          {['directoryFuzzer', 'apiFuzzer', 'parameterFuzzer', 'subdomainDiscovery', 'vhostDiscovery', 'reports'].map((text) => (
+          {['directoryFuzzer', 'apiFuzzer', 'parameterFuzzer', 'subdomainDiscovery', 'vhostDiscovery', 'reports', 'testSites'].map((text) => (
             <ListItem className='hover:cursor-pointer' button key={text} onClick={() => setActiveTab(text)} selected={activeTab === text}>
               <ListItemIcon >
                 {text === 'directoryFuzzer' && <FolderOpen />}
@@ -274,8 +277,9 @@ const WebFuzzForgeDashboard = ({ token, setToken }) => {
                 {text === 'subdomainDiscovery' && <Language />}
                 {text === 'vhostDiscovery' && <Public />}
                 {text === 'reports' && <Assignment />}
+                {text === 'testSites' && <Public />}
               </ListItemIcon>
-              <ListItemText primary={text === 'reports' ? 'Reports/Logs' : text.replace(/([A-Z])/g, ' $1').trim()} />
+              <ListItemText primary={text === 'reports' ? 'Reports/Logs' : text === 'testSites' ? 'Test Sites' : text.replace(/([A-Z])/g, ' $1').trim()} />
             </ListItem>
           ))}
         </List>
