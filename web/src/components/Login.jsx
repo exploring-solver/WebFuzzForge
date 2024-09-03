@@ -14,7 +14,7 @@ const Login = ({ setToken }) => {
             const { data } = await axios.post(`${backendUrl}/login`, { username, password });
             localStorage.setItem('token', data.token);
             setToken(data.token);
-            navigate('/')
+            navigate('/');
         } catch (error) {
             console.error('Login failed', error);
         }

@@ -22,8 +22,8 @@ const ReportGenerator = () => {
 
   return (
     <Container>
-      <h1>Generate Report</h1>
-      <form onSubmit={handleSubmit}>
+      <h1 className='text-center text-3xl py-4'>Generate Report</h1>
+      <form onSubmit={handleSubmit} className='flex flex-col gap-4'>
         <TextField label="Tool Name" fullWidth value={toolName} onChange={(e) => setToolName(e.target.value)} />
         <TextField label="Output" fullWidth value={output} onChange={(e) => setOutput(e.target.value)} />
         <Button type="submit" variant="contained" color="primary">Generate Report</Button>
