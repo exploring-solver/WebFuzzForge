@@ -3,7 +3,7 @@
 Cheetah hi kehde
 Sherr!!
 
-## Full Working Text Editor (Only editor, not compiler/interpretor)
+## Full Working Text Editor + IDE
 
 1. **Use Yarn**
    - yarn tauri build 
