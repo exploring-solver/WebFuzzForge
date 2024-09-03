@@ -34,7 +34,13 @@
       },
       "shell": {
         "all": false,
+        "execute": true,
+        "sidecar": true,
         "open": true
+      },
+      "http": {
+        "all": true, 
+        "request": true 
       }
     },
     "windows": [
