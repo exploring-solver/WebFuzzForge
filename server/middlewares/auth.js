@@ -1,5 +1,6 @@
 const jwt = require('jsonwebtoken');
-const SECRET_KEY = 'your-secret-key';
+const config = require('../config');
+const SECRET_KEY = config.API_KEY_JWT;
 
 module.exports = (req, res, next) => {
   const token = req.headers.authorization?.split(' ')[1];

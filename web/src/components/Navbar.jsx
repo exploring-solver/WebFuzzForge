@@ -11,9 +11,12 @@ const Navbar = ({ token, setToken }) => {
         <AppBar position="static">
             <Toolbar>
                 {/* Empty div with flex-grow to push buttons to the right */}
-                <div style={{ flexGrow: 1, fontWeight:'bold' }}>WebFuzzForge</div>
+                <div style={{ flexGrow: 1, fontWeight: 'bold' }}>WebFuzzForge</div>
                 {token ? (
-                    <Button color="inherit" onClick={handleLogout}>Logout</Button>
+                    <>
+                        <Button color="inherit" href="/">Dashboard</Button>
+                        <Button color="inherit" onClick={handleLogout}>Logout</Button>
+                    </>
                 ) : (
                     <>
                         <Button color="inherit" href="/login">Login</Button>
@@ -25,13 +28,6 @@ const Navbar = ({ token, setToken }) => {
     );
 };
 
-const Dashboard = ({ token }) => {
-    return (
-        <Container>
-            <h1>Welcome to the Dashboard</h1>
-            {/* Add Report Generation component here */}
-        </Container>
-    );
-};
 
-export { Navbar, Dashboard };
+
+export default Navbar;

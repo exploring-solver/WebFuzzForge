@@ -1,13 +1,63 @@
 import React, { useState } from 'react';
+import {
+  AppBar,
+  Toolbar,
+  Typography,
+  Drawer,
+  List,
+  ListItem,
+  ListItemIcon,
+  ListItemText,
+  TextField,
+  Button,
+  Paper,
+  Grid,
+  IconButton,
+  Tooltip,
+} from '@mui/material';
+import { styled } from '@mui/material/styles';
+import {
+  FolderOpen,
+  Api,
+  Code,
+  Language,
+  Public,
+  Help,
+  Assignment,
+} from '@mui/icons-material';
+import Navbar from './Navbar';
+import ReportList from './ReportList';
+import ReportsList from './ReportList';
 
-const WebFuzzForgeDashboard = () => {
+const drawerWidth = 240;
+
+const Main = styled('main', { shouldForwardProp: (prop) => prop !== 'open' })(
+  ({ theme, open }) => ({
+    flexGrow: 1,
+    padding: theme.spacing(3),
+    transition: theme.transitions.create('margin', {
+      easing: theme.transitions.easing.sharp,
+      duration: theme.transitions.duration.leavingScreen,
+    }),
+    marginLeft: `-${drawerWidth}px`,
+    ...(open && {
+      transition: theme.transitions.create('margin', {
+        easing: theme.transitions.easing.easeOut,
+        duration: theme.transitions.duration.enteringScreen,
+      }),
+      marginLeft: 0,
+    }),
+  }),
+);
+
+const WebFuzzForgeDashboard = ({ token, setToken }) => {
   const backendUrl = import.meta.env.VITE_BACKEND_URL;
   const [baseUrl, setBaseUrl] = useState(backendUrl);
   const [results, setResults] = useState({});
   const [loading, setLoading] = useState(false);
   const [activeTab, setActiveTab] = useState('directoryFuzzer');
 
-  // New state for user inputs
+  // State for user inputs
   const [directories, setDirectories] = useState(['admin', 'config', 'backup', 'test']);
   const [apiEndpoints, setApiEndpoints] = useState(['/api/v1/users', '/api/v1/products']);
   const [apiMethods, setApiMethods] = useState(['GET', 'POST', 'PUT', 'DELETE']);
@@ -24,6 +74,7 @@ const WebFuzzForgeDashboard = () => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
         },
         body: JSON.stringify(getFuzzerParams(fuzzerName)),
       });
@@ -35,7 +86,6 @@ const WebFuzzForgeDashboard = () => {
     }
     setLoading(false);
   };
-
   const getFuzzerParams = (fuzzerName) => {
     switch (fuzzerName) {
       case 'directoryFuzzer':
@@ -56,13 +106,15 @@ const WebFuzzForgeDashboard = () => {
   const renderResults = (fuzzerName) => {
     const fuzzerResults = results[fuzzerName];
     if (!fuzzerResults) return null;
-    if (typeof fuzzerResults === 'string') return <p className="text-red-500">{fuzzerResults}</p>;
+    if (typeof fuzzerResults === 'string') return <Typography color="error">{fuzzerResults}</Typography>;
     return (
-      <ul>
+      <List>
         {fuzzerResults.map((result, index) => (
-          <li key={index}>{JSON.stringify(result)}</li>
+          <ListItem key={index}>
+            <ListItemText primary={JSON.stringify(result)} />
+          </ListItem>
         ))}
-      </ul>
+      </List>
     );
   };
 
@@ -70,118 +122,168 @@ const WebFuzzForgeDashboard = () => {
     switch (activeTab) {
       case 'directoryFuzzer':
         return (
-          <div>
-            <h3 className="text-lg font-semibold mb-2">Directories to Fuzz</h3>
-            <input
-              type="text"
-              value={directories.join(', ')}
-              onChange={(e) => setDirectories(e.target.value.split(', '))}
-              className="w-full p-2 mb-4 border rounded"
-            />
-          </div>
+          <TextField
+            fullWidth
+            label="Directories to Fuzz"
+            value={directories.join(', ')}
+            onChange={(e) => setDirectories(e.target.value.split(', '))}
+            margin="normal"
+          />
         );
       case 'apiFuzzer':
         return (
-          <div>
-            <h3 className="text-lg font-semibold mb-2">API Endpoints</h3>
-            <input
-              type="text"
+          <>
+            <TextField
+              fullWidth
+              label="API Endpoints"
               value={apiEndpoints.join(', ')}
               onChange={(e) => setApiEndpoints(e.target.value.split(', '))}
-              className="w-full p-2 mb-4 border rounded"
+              margin="normal"
             />
-            <h3 className="text-lg font-semibold mb-2">HTTP Methods</h3>
-            <input
-              type="text"
+            <TextField
+              fullWidth
+              label="HTTP Methods"
               value={apiMethods.join(', ')}
               onChange={(e) => setApiMethods(e.target.value.split(', '))}
-              className="w-full p-2 mb-4 border rounded"
+              margin="normal"
             />
-          </div>
+          </>
         );
       case 'parameterFuzzer':
         return (
-          <div>
-            <h3 className="text-lg font-semibold mb-2">Endpoint</h3>
-            <input
-              type="text"
+          <>
+            <TextField
+              fullWidth
+              label="Endpoint"
               value={paramEndpoint}
               onChange={(e) => setParamEndpoint(e.target.value)}
-              className="w-full p-2 mb-4 border rounded"
+              margin="normal"
             />
-            <h3 className="text-lg font-semibold mb-2">Parameters</h3>
-            <input
-              type="text"
+            <TextField
+              fullWidth
+              label="Parameters"
               value={parameters.join(', ')}
               onChange={(e) => setParameters(e.target.value.split(', '))}
-              className="w-full p-2 mb-4 border rounded"
+              margin="normal"
             />
-            <h3 className="text-lg font-semibold mb-2">Payloads</h3>
-            <input
-              type="text"
+            <TextField
+              fullWidth
+              label="Payloads"
               value={payloads.join(', ')}
               onChange={(e) => setPayloads(e.target.value.split(', '))}
-              className="w-full p-2 mb-4 border rounded"
+              margin="normal"
             />
-          </div>
+          </>
         );
       case 'subdomainDiscovery':
         return (
-          <div>
-            <h3 className="text-lg font-semibold mb-2">Subdomains to Check</h3>
-            <input
-              type="text"
-              value={subdomains.join(', ')}
-              onChange={(e) => setSubdomains(e.target.value.split(', '))}
-              className="w-full p-2 mb-4 border rounded"
-            />
-          </div>
+          <TextField
+            fullWidth
+            label="Subdomains to Check"
+            value={subdomains.join(', ')}
+            onChange={(e) => setSubdomains(e.target.value.split(', '))}
+            margin="normal"
+          />
         );
       case 'vhostDiscovery':
         return (
-          <div>
-            <h3 className="text-lg font-semibold mb-2">VHosts to Check</h3>
-            <input
-              type="text"
-              value={vhosts.join(', ')}
-              onChange={(e) => setVhosts(e.target.value.split(', '))}
-              className="w-full p-2 mb-4 border rounded"
-            />
-          </div>
+          <TextField
+            fullWidth
+            label="VHosts to Check"
+            value={vhosts.join(', ')}
+            onChange={(e) => setVhosts(e.target.value.split(', '))}
+            margin="normal"
+          />
         );
       default:
         return null;
     }
   };
 
-  return (
-    <div className="container mx-auto p-4">
-      <h1 className="text-2xl font-bold mb-4">WebFuzzForge Dashboard</h1>
-      <input
-        type="text"
-        value={baseUrl}
-        onChange={(e) => setBaseUrl(e.target.value)}
-        placeholder="Enter base URL"
-        className="w-full p-2 mb-4 border rounded"
-      />
-      <div className="mb-4 flex ">
-        <button onClick={() => setActiveTab('directoryFuzzer')} className={`mr-2 p-2 ${activeTab === 'directoryFuzzer' ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}>Directory Fuzzer</button>
-        <button onClick={() => setActiveTab('apiFuzzer')} className={`mr-2 p-2 ${activeTab === 'apiFuzzer' ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}>API Fuzzer</button>
-        <button onClick={() => setActiveTab('parameterFuzzer')} className={`mr-2 p-2 ${activeTab === 'parameterFuzzer' ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}>Parameter Fuzzer</button>
-        <button onClick={() => setActiveTab('subdomainDiscovery')} className={`mr-2 p-2 ${activeTab === 'subdomainDiscovery' ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}>Subdomain Discovery</button>
-        <button onClick={() => setActiveTab('vhostDiscovery')} className={`mr-2 p-2 ${activeTab === 'vhostDiscovery' ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}>VHost Discovery</button>
-      </div>
-      <div className="border p-4 rounded">
+  const toolInfo = {
+    directoryFuzzer: "Scans for hidden directories on the target website",
+    apiFuzzer: "Tests various API endpoints with different HTTP methods",
+    parameterFuzzer: "Fuzzes parameters with payloads to find vulnerabilities",
+    subdomainDiscovery: "Discovers subdomains of the target domain",
+    vhostDiscovery: "Identifies virtual hosts on the target server",
+  };
+  const renderContent = () => {
+    if (activeTab === 'reports') {
+      return <ReportList token={token} />;
+    }
+
+    return (
+      <Paper elevation={3} sx={{ p: 3, mt: 3 }}>
+        <Grid container spacing={2} alignItems="center">
+          <Grid item xs={11}>
+            <TextField
+              fullWidth
+              label="Base URL"
+              value={baseUrl}
+              onChange={(e) => setBaseUrl(e.target.value)}
+            />
+          </Grid>
+          <Grid item xs={1}>
+            <Tooltip title={toolInfo[activeTab]}>
+              <IconButton>
+                <Help />
+              </IconButton>
+            </Tooltip>
+          </Grid>
+        </Grid>
         {renderInputs()}
-        <button 
-          onClick={() => runFuzzer(activeTab, activeTab.replace(/([A-Z])/g, '-$1').toLowerCase())} 
-          disabled={loading} 
-          className="bg-green-500 text-white p-2 rounded mt-4"
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={() => runFuzzer(activeTab, activeTab.replace(/([A-Z])/g, '-$1').toLowerCase())}
+          disabled={loading}
+          sx={{ mt: 2 }}
         >
           Run {activeTab.replace(/([A-Z])/g, ' $1').trim()}
-        </button>
+        </Button>
         {renderResults(activeTab)}
-      </div>
+      </Paper>
+    );
+  };
+
+  return (
+    <div style={{ display: 'flex' }}>
+      <AppBar position="fixed" sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}>
+        <Navbar token={token} setToken={setToken}/>
+      </AppBar>
+      <Drawer
+        sx={{
+          width: drawerWidth,
+          flexShrink: 0,
+          '& .MuiDrawer-paper': {
+            width: drawerWidth,
+            boxSizing: 'border-box',
+          },
+        }}
+        variant="permanent"
+        anchor="left"
+      >
+        <Toolbar />
+        <List>
+          {['directoryFuzzer', 'apiFuzzer', 'parameterFuzzer', 'subdomainDiscovery', 'vhostDiscovery', 'reports'].map((text) => (
+            <ListItem className='hover:cursor-pointer' button key={text} onClick={() => setActiveTab(text)} selected={activeTab === text}>
+              <ListItemIcon >
+                {text === 'directoryFuzzer' && <FolderOpen />}
+                {text === 'apiFuzzer' && <Api />}
+                {text === 'parameterFuzzer' && <Code />}
+                {text === 'subdomainDiscovery' && <Language />}
+                {text === 'vhostDiscovery' && <Public />}
+                {text === 'reports' && <Assignment />}
+              </ListItemIcon>
+              <ListItemText primary={text === 'reports' ? 'Reports/Logs' : text.replace(/([A-Z])/g, ' $1').trim()} />
+            </ListItem>
+          ))}
+        </List>
+      </Drawer>
+      <Main open={true}>
+        <Toolbar />
+        {renderContent()}
+      </Main>
     </div>
   );
 };
