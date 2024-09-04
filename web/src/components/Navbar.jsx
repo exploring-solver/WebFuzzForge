@@ -14,7 +14,7 @@ const Navbar = ({ token, setToken }) => {
                 <div style={{ flexGrow: 1, fontWeight: 'bold' }}>WebFuzzForge</div>
                 {token ? (
                     <>
-                        <Button color="inherit" href="/">Dashboard</Button>
+                        <Button color="inherit" href="/dashboard">Dashboard</Button>
                         <Button color="inherit" onClick={handleLogout}>Logout</Button>
                     </>
                 ) : (

@@ -18,6 +18,10 @@ require('./db');
 
 const reportGenerator = new ReportGenerator();
 
+app.get('/',(req,res)=>{
+  res.json("hello pgdms devs here")
+})
+
 app.post('/directory-fuzzer', authMiddleware, async (req, res) => {
   const { baseUrl, directories } = req.body;
   const directoryFuzzer = new DirectoryFuzzer(baseUrl);
