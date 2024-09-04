@@ -1,0 +1,297 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tauri IDE</title>
+  <link rel="stylesheet" href="lib/codemirror.css">
+  <link rel="stylesheet" href="addon/dialog/dialog.css">
+  <link rel="stylesheet" href="theme/dracula.css">
+  <link rel="stylesheet" href="node_modules_codemirror/xterm/css/xterm.css">
+  <style>
+    body, html {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    #header {
+      padding: 10px;
+      background: #1e1e1e;
+      color: #ffffff;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid #333;
+    }
+    #header button {
+      background-color: #007acc;
+      border: none;
+      color: white;
+      padding: 6px 12px;
+      text-align: center;
+      text-decoration: none;
+      display: inline-block;
+      font-size: 14px;
+      margin: 2px;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+    #header button:hover {
+      background-color: #005a9e;
+    }
+    #sidebar {
+      width: 200px;
+      background: #1e1e1e;
+      color: #ffffff;
+      padding: 10px;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      border-right: 1px solid #333;
+      overflow-y: auto;
+      transition: width 0.3s;
+    }
+    #sidebar.closed {
+      width: 0;
+      padding: 0;
+      overflow: hidden;
+      border-right: none;
+    }
+
+  .sidebar-option {
+    margin: 10px 0;
+    cursor: pointer;
+    padding: 10px;
+    border-radius: 3px;
+    background: #333;
+    text-align: center;
+    transition: background-color 0.2s;
+  }
+
+  .sidebar-option:hover {
+    background: #444;
+  }
+    #workspace {
+      display: flex;
+      height: calc(100% - 40px);
+      overflow: hidden;
+    }
+    #file-tree {
+      width: 250px;
+      background: #252526;
+      color: #d4d4d4;
+      overflow-y: auto;
+      padding: 10px;
+      border-right: 1px solid #333;
+    }
+
+    #main-container {
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
+    }
+    #editor {
+      flex-grow: 1;
+      background: #1e1e1e;
+      color: #d4d4d4;
+      padding: 10px;
+      overflow: auto;
+    }
+
+    #terminal {
+      height: 200px;
+      background: #1e1e1e;
+      color: #d4d4d4;
+      padding: 10px;
+      overflow-y: auto;
+      border-top: 1px solid #333;
+    }
+    .CodeMirror {
+      height: 100%;
+    }
+    .file, .folder {
+      cursor: pointer;
+      padding: 5px 8px;
+      border-radius: 3px;
+      margin-bottom: 3px;
+      transition: background-color 0.2s;
+    }
+    .file:hover {
+      background: #3c3c3c;
+    }
+    .folder {
+      font-weight: bold;
+    }
+    .folder:hover {
+      background: #3c3c3c;
+    }
+    .folder.expanded::before {
+      content: "📂";
+      padding-right: 5px;
+    }
+    .folder.collapsed::before {
+      content: "📁";
+      padding-right: 5px;
+    }
+    .nested {
+      display: none;
+      padding-left: 20px;
+    }
+    .active {
+      display: block;
+    }
+    #sidebar {
+      width: 200px;
+      background: #1e1e1e;
+      color: #ffffff;
+      padding: 10px;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      border-right: 1px solid #333;
+      overflow-y: auto;
+    }
+    .sidebar-option {
+      margin: 10px 0;
+      cursor: pointer;
+      padding: 10px;
+      border-radius: 3px;
+      background: #333;
+      text-align: center;
+      transition: background-color 0.2s;
+    }
+    .sidebar-option:hover {
+      background: #444;
+    }
+    #fuzzer-container, #api-fuzzer-container {
+      display: none;
+      padding: 10px;
+      flex-grow: 1;
+      background: #2e2e2e;
+      color: white;
+      flex-direction: column;
+    }
+    #fuzzer-container h3, #api-fuzzer-container h3 {
+      margin-top: 0;
+    }
+    .close-button {
+      float: right;
+      font-size: 18px;
+      font-weight: bold;
+      cursor: pointer;
+      color: #ffffff;
+      margin-left: 10px;
+      transition: color 0.2s;
+    }
+
+    .close-button:hover {
+      color: #ff5c5c;
+    }
+
+    #fuzzer-container h3, #api-fuzzer-container h3 {
+      margin: 0;
+      padding-bottom: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #1e1e1e;
+    }
+    ::-webkit-scrollbar-thumb {
+      background-color: #555;
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background-color: #666;
+    }
+  </style>
+  
+</head>
+<body>
+
+  <div id="header">
+    <button id="toggle-sidebar">☰</button>
+    <button id="open-folder">Open Folder</button>
+    <span id="current-file"></span>
+    <button id="save-file">Save File</button>
+    <button id="run-code">Run Code</button>
+    <!-- Add Clear Terminal Button -->
+    <button id="clear-terminal">Clear Terminal</button>
+  </div>
+  
+
+<div id="fuzzer-container">
+  <h3>Directory Fuzzer <span class="close-button" onclick="closeFuzzer('fuzzer-container')">×</span></h3>
+  <textarea id="wordlist" placeholder="Enter wordlist, one per line or space-separated"></textarea>
+  <button id="run-fuzzer">Run Fuzzer</button>
+</div>
+
+<div id="api-fuzzer-container" style="display: none; flex-direction: column; padding: 10px;">
+  <h3>API Fuzzer <span class="close-button" onclick="closeFuzzer('api-fuzzer-container')">×</span></h3>
+  <textarea id="endpoints" placeholder="Enter endpoints, one per line"></textarea>
+  <textarea id="methods" placeholder="Enter HTTP methods, comma-separated (e.g., GET,POST)"></textarea>
+  <button id="run-api-fuzzer">Run API Fuzzer</button>
+</div>
+
+
+
+<div id="workspace">
+  <div id="sidebar">
+    <div id="directory-fuzzer" class="sidebar-option">Directory Fuzzer</div>
+    <div id="api-fuzzer" class="sidebar-option">API Fuzzer</div>
+    <!-- Add other options here -->
+  </div>
+  <div id="file-tree"></div>
+  <div id="main-container">
+    <div id="editor">
+      <textarea id="code-editor"></textarea>
+    </div>
+    <div id="terminal"></div>
+  </div>
+</div>
+
+<script src="lib/codemirror.js"></script>
+<script src="mode/javascript/javascript.js"></script>
+<script src="mode/htmlmixed/htmlmixed.js"></script>
+<script src="mode/xml/xml.js"></script>
+<script src="mode/css/css.js"></script>
+<script src="addon/edit/matchbrackets.js"></script>
+<script src="addon/dialog/dialog.js"></script>
+<script src="addon/search/search.js"></script>
+<script src="addon/search/searchcursor.js"></script>
+<script src="addon/scroll/simplescrollbars.js"></script>
+<script src="addon/selection/active-line.js"></script>
+<script src="addon/selection/mark-selection.js"></script>
+<script src="addon/edit/matchtags.js"></script>
+<script src="addon/fold/foldcode.js"></script>
+<script src="addon/fold/foldgutter.js"></script>
+<script src="addon/fold/brace-fold.js"></script>
+<script src="addon/fold/xml-fold.js"></script>
+<script src="addon/fold/indent-fold.js"></script>
+<script src="addon/fold/markdown-fold.js"></script>
+<script src="addon/fold/comment-fold.js"></script>
+<script src="addon/selection/selection-pointer.js"></script>
+<script src="addon/lint/lint.js"></script>
+<script src="addon/hint/show-hint.js"></script>
+<script src="addon/hint/javascript-hint.js"></script>
+<script src="addon/hint/anyword-hint.js"></script>
+<script src="addon/hint/css-hint.js"></script>
+<script src="addon/hint/html-hint.js"></script>
+<script src="addon/hint/xml-hint.js"></script>
+<script src="addon/comment/comment.js"></script>
+<script src="addon/comment/continuecomment.js"></script>
+<script src="addon/display/autorefresh.js"></script>
+<script src="addon/display/fullscreen.js"></script>
+<script src="node_modules_codemirror/xterm/lib/xterm.js"></script>
+<script src="index.js"></script>
+
+</body>
+</html>
