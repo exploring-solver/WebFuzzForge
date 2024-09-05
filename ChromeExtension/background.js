@@ -26,19 +26,53 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
     }
   });
   
+  // // Listen for messages from the popup
+  // chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+  //   if (request.action === 'simulateAttack') {
+  //     chrome.tabs.query({active: true, currentWindow: true}, (tabs) => {
+  //       const activeTab = tabs[0];
+  //       if (activeTab) {
+  //         chrome.scripting.executeScript({
+  //           target: {tabId: activeTab.id},
+  //           files: ['content-script.js']
+  //         }, () => {
+  //           chrome.tabs.sendMessage(activeTab.id, {action: 'simulateAttack', attackType: request.attackType});
+  //         });
+  //       }
+  //     });
+  //   }
+  // });
   // Listen for messages from the popup
-  chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-    if (request.action === 'simulateAttack') {
-      chrome.tabs.query({active: true, currentWindow: true}, (tabs) => {
-        const activeTab = tabs[0];
-        if (activeTab) {
-          chrome.scripting.executeScript({
-            target: {tabId: activeTab.id},
-            files: ['content-script.js']
-          }, () => {
-            chrome.tabs.sendMessage(activeTab.id, {action: 'simulateAttack', attackType: request.attackType});
-          });
-        }
+chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+  if (request.action === 'simulateAttack' || request.action === 'simulateAllAttacks') {
+      chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+          const activeTab = tabs[0];
+          if (activeTab) {
+              chrome.scripting.executeScript({
+                  target: { tabId: activeTab.id },
+                  files: ['content-script.js']
+              }, () => {
+                  chrome.tabs.sendMessage(activeTab.id, request);
+              });
+          }
       });
-    }
-  });
+  }
+});
+
+
+  // Store reports
+let attackReports = {};
+
+// Listen for messages from content scripts (report generation)
+chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+  if (request.action === 'reportGenerated') {
+    attackReports[request.attackType] = request.report;
+  }
+});
+
+// Listen for messages from popup.js to send the report data
+chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+  if (request.action === 'getReports') {
+    sendResponse({ reports: attackReports });
+  }
+});
