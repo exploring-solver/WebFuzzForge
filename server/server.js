@@ -23,30 +23,38 @@ app.get('/',(req,res)=>{
   res.json("hello pgdms devs here")
 })
 
-app.post('/directory-fuzzer', authMiddleware, async (req, res) => {
-  try {
-    const { baseUrl, wordlist, extensions, maxDepth } = req.body;
+// app.post('/directory-fuzzer', authMiddleware, async (req, res) => {
+//   try {
+//     const { baseUrl, wordlist, extensions, maxDepth } = req.body;
 
-    const directoryFuzzer = new AdvancedDirectoryFuzzer(baseUrl);
+//     const directoryFuzzer = new AdvancedDirectoryFuzzer(baseUrl);
 
-    const results = await directoryFuzzer.fuzzDirectoriesAndFiles(wordlist, extensions, maxDepth);
+//     const results = await directoryFuzzer.fuzzDirectoriesAndFiles(wordlist, extensions, maxDepth);
 
-    // Test for vulnerabilities
-    const vulnerabilities = await directoryFuzzer.testVulnerabilities();
-    results.vulnerabilities = vulnerabilities;
+//     // Test for vulnerabilities
+//     const vulnerabilities = await directoryFuzzer.testVulnerabilities();
+//     results.vulnerabilities = vulnerabilities;
 
-    console.log(req.user);
+//     console.log(req.user);
 
-    await reportGenerator.generateReport(req.user.userId, baseUrl, 'Directory Fuzzer', results);
+//     await reportGenerator.generateReport(req.user.userId, baseUrl, 'Directory Fuzzer', results);
 
-    res.json(results);
-  } catch (error) {
-    console.error('Error in /directory-fuzzer:', error);
-    res.status(500).json({ error: 'An error occurred while fuzzing directories' });
-  }
+//     res.json(results);
+//   } catch (error) {
+//     console.error('Error in /directory-fuzzer:', error);
+//     res.status(500).json({ error: 'An error occurred while fuzzing directories' });
+//   }
+// });
+app.post('/directory-fuzzer', async (req, res) => {
+  const { baseUrl, directories } = req.body;
+  const directoryFuzzer = new DirectoryFuzzer(baseUrl);
+  const results = await directoryFuzzer.fuzzDirectories(directories);
+  console.log(req.user);
+  await reportGenerator.generateReport(req.user.userId, baseUrl, 'Directory Fuzzer', results);
+  res.json(results);
 });
 
-app.post('/api-fuzzer', authMiddleware, async (req, res) => {
+app.post('/api-fuzzer', async (req, res) => {
   const { baseUrl, endpoints, methods } = req.body;
   const apiFuzzer = new APIFuzzer(baseUrl);
   const results = await apiFuzzer.fuzzAPIEndpoints(endpoints, methods);
@@ -54,7 +62,7 @@ app.post('/api-fuzzer', authMiddleware, async (req, res) => {
   res.json(results);
 });
 
-app.post('/parameter-fuzzer', authMiddleware, async (req, res) => {
+app.post('/parameter-fuzzer', async (req, res) => {
   const { baseUrl, endpoint, parameters, payloads } = req.body;
   const parameterFuzzer = new ParameterFuzzer(baseUrl);
   const results = await parameterFuzzer.fuzzParameters(endpoint, parameters, payloads);
@@ -62,7 +70,7 @@ app.post('/parameter-fuzzer', authMiddleware, async (req, res) => {
   res.json(results);
 });
 
-app.post('/subdomain-discovery', authMiddleware, async (req, res) => {
+app.post('/subdomain-discovery', async (req, res) => {
   const { baseUrl, subdomains } = req.body;
   const domain = new URL(baseUrl).hostname;
   const subdomainDiscovery = new SubdomainDiscovery();
@@ -71,7 +79,7 @@ app.post('/subdomain-discovery', authMiddleware, async (req, res) => {
   res.json(results);
 });
 
-app.post('/vhost-discovery', authMiddleware, async (req, res) => {
+app.post('/vhost-discovery', async (req, res) => {
   const { baseUrl, vhosts } = req.body;
   const vhostDiscovery = new VHostDiscovery(baseUrl);
   const results = await vhostDiscovery.discoverVHosts(vhosts);
