@@ -6,13 +6,13 @@ const drawerWidth = 240;
 
 const Sidebar = ({ activeTab, setActiveTab }) => {
   const menuItems = [
+    { text: 'Test Sites', value: 'testSites', icon: <Public /> },
     { text: 'Directory Fuzzer', value: 'directoryFuzzer', icon: <FolderOpen /> },
     { text: 'API Fuzzer', value: 'apiFuzzer', icon: <Api /> },
     { text: 'Parameter Fuzzer', value: 'parameterFuzzer', icon: <Code /> },
     { text: 'Subdomain Discovery', value: 'subdomainDiscovery', icon: <Language /> },
     { text: 'VHost Discovery', value: 'vhostDiscovery', icon: <Public /> },
     { text: 'Reports/Logs', value: 'reports', icon: <Assignment /> },
-    { text: 'Test Sites', value: 'testSites', icon: <Public /> },
   ];
 
   return (

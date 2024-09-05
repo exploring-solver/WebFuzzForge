@@ -15,6 +15,9 @@ const Navbar = ({ token, setToken }) => {
                 {token ? (
                     <>
                         <Button color="inherit" href="/dashboard">Dashboard</Button>
+                        <Button color="inherit" href="/dold">Directory Fuzzer</Button>
+                        <Button color="inherit" href="/analytics">Analytics</Button>
+                        <Button color="inherit" href="/community">Community Forums</Button>
                         <Button color="inherit" onClick={handleLogout}>Logout</Button>
                     </>
                 ) : (

@@ -9,6 +9,8 @@ import TestSiteManager from './components/dashboard/TestSiteManager';
 // import WebFuzzForgeDashboard from './components/dashboard/WebFuzzForgeDashboard';
 import WebFuzzForgeDashboard from './components/ReferenceWebFuzzForgeDashboardOld';
 import MainDashboard from './components/dashboard/MainDashboard';
+import WebFuzzForgeCommunity from './components/dashboard/WebFuzzForgeCommunity';
+import MonitoringDashboard from './components/dashboard/MonitoringDashboard';
 
 const App = () => {
   const [token, setToken] = useState(localStorage.getItem('token'));
@@ -19,6 +21,9 @@ const App = () => {
       <Routes>
         <Route path="/" element={<Dashboard  token={token} setToken={setToken}/>} />
         <Route path="/dashboard" element={<MainDashboard  token={token} setToken={setToken}/>} />
+        <Route path="/dold" element={<WebFuzzForgeDashboard  token={token} setToken={setToken}/>} />
+        <Route path="/community" element={<WebFuzzForgeCommunity/>} />
+        <Route path="/analytics" element={<MonitoringDashboard/>} />
         <Route path="/dashboard/:siteId" element={<WebFuzzForgeDashboard  token={token} setToken={setToken}/>} />
         <Route path="/login" element={<Login setToken={setToken} />} />
         <Route path="/testmanager" element={<TestSiteManager setToken={setToken} />} />
