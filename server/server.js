@@ -10,6 +10,7 @@ const authControllers = require('./controllers/Auth.Controllers');
 const authMiddleware = require('./middlewares/auth');
 const ReportGenerator = require('./controllers/Report.controller');
 const testSiteControllers = require('./controllers/TestSite.controllers');
+const AdvancedDirectoryFuzzer = require('../packages/directory-fuzzer');
 const app = express();
 app.use(cors());
 app.use(express.json());
@@ -23,12 +24,26 @@ app.get('/',(req,res)=>{
 })
 
 app.post('/directory-fuzzer', authMiddleware, async (req, res) => {
-  const { baseUrl, directories } = req.body;
-  const directoryFuzzer = new DirectoryFuzzer(baseUrl);
-  const results = await directoryFuzzer.fuzzDirectories(directories);
-  console.log(req.user);
-  await reportGenerator.generateReport(req.user.userId, baseUrl, 'Directory Fuzzer', results);
-  res.json(results);
+  try {
+    const { baseUrl, wordlist, extensions, maxDepth } = req.body;
+
+    const directoryFuzzer = new AdvancedDirectoryFuzzer(baseUrl);
+
+    const results = await directoryFuzzer.fuzzDirectoriesAndFiles(wordlist, extensions, maxDepth);
+
+    // Test for vulnerabilities
+    const vulnerabilities = await directoryFuzzer.testVulnerabilities();
+    results.vulnerabilities = vulnerabilities;
+
+    console.log(req.user);
+
+    await reportGenerator.generateReport(req.user.userId, baseUrl, 'Directory Fuzzer', results);
+
+    res.json(results);
+  } catch (error) {
+    console.error('Error in /directory-fuzzer:', error);
+    res.status(500).json({ error: 'An error occurred while fuzzing directories' });
+  }
 });
 
 app.post('/api-fuzzer', authMiddleware, async (req, res) => {

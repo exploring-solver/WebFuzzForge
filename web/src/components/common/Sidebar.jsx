@@ -6,13 +6,13 @@ const drawerWidth = 240;
 
 const Sidebar = ({ activeTab, setActiveTab }) => {
   const menuItems = [
-    { text: 'Directory Fuzzer', icon: <FolderOpen />, value: 'directoryFuzzer' },
-    { text: 'API Fuzzer', icon: <Api />, value: 'apiFuzzer' },
-    { text: 'Parameter Fuzzer', icon: <Code />, value: 'parameterFuzzer' },
-    { text: 'Subdomain Discovery', icon: <Language />, value: 'subdomainDiscovery' },
-    { text: 'VHost Discovery', icon: <Public />, value: 'vhostDiscovery' },
-    { text: 'Reports/Logs', icon: <Assignment />, value: 'reports' },
-    { text: 'Test Sites', icon: <Public />, value: 'testSites' },
+    { text: 'Directory Fuzzer', value: 'directoryFuzzer', icon: <FolderOpen /> },
+    { text: 'API Fuzzer', value: 'apiFuzzer', icon: <Api /> },
+    { text: 'Parameter Fuzzer', value: 'parameterFuzzer', icon: <Code /> },
+    { text: 'Subdomain Discovery', value: 'subdomainDiscovery', icon: <Language /> },
+    { text: 'VHost Discovery', value: 'vhostDiscovery', icon: <Public /> },
+    { text: 'Reports/Logs', value: 'reports', icon: <Assignment /> },
+    { text: 'Test Sites', value: 'testSites', icon: <Public /> },
   ];
 
   return (
@@ -32,7 +32,6 @@ const Sidebar = ({ activeTab, setActiveTab }) => {
       <List>
         {menuItems.map((item) => (
           <ListItem
-          className='hover:cursor-pointer'
             button
             key={item.value}
             onClick={() => setActiveTab(item.value)}
