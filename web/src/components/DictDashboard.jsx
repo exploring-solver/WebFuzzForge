@@ -26,11 +26,10 @@ import {
   Assignment,
   Remove,
   Add,
-  Upload,
-  Input,
 } from '@mui/icons-material';
 import Navbar from './Navbar';
 import ReportList from './reports/ReportList';
+import ReportsList from './reports/ReportList';
 import TestSiteManager from './dashboard/TestSiteManager';
 
 const drawerWidth = 240;
@@ -54,14 +53,13 @@ const Main = styled('main', { shouldForwardProp: (prop) => prop !== 'open' })(
   }),
 );
 
-const WebFuzzForgeDashboard = ({ token, setToken }) => {
+const DictDashboard = ({ token, setToken }) => {
   const backendUrl = import.meta.env.VITE_BACKEND_URL;
   const [baseUrl, setBaseUrl] = useState(backendUrl);
   const [results, setResults] = useState({});
   const [loading, setLoading] = useState(false);
   const [activeTab, setActiveTab] = useState('directoryFuzzer');
   const [selectedTestSite, setSelectedTestSite] = useState(null);
-  const [dictionaryFile, setDictionaryFile] = useState(null);
   // State for user inputs
   const [directories, setDirectories] = useState(['admin', 'config', 'backup', 'test']);
   const [apiEndpoints, setApiEndpoints] = useState(['/api/v1/users', '/api/v1/products']);
@@ -207,14 +205,7 @@ const WebFuzzForgeDashboard = ({ token, setToken }) => {
         return null;
     }
   };
-  const handleFileUpload = (event) => {
-    const file = event.target.files[0];
-    if (file) {
-      setDictionaryFile(file);
-      // For now, we're just storing the file in state and not sending it anywhere
-      console.log("Dictionary file selected:", file.name);
-    }
-  };
+
   const renderContent = () => {
     if (activeTab === 'reports') {
       return <ReportList token={token} />;
@@ -241,41 +232,6 @@ const WebFuzzForgeDashboard = ({ token, setToken }) => {
                 <Help />
               </IconButton>
             </Tooltip>
-          </Grid>
-        </Grid>
-        <Grid container spacing={2} alignItems="center" sx={{ mt: 2 }}>
-          <Grid item display={'flex'} gap={'10px'} xs={12}>
-            <Button
-              variant="outlined"
-              component="label"
-              startIcon={<Upload />}
-            >
-              Add Dictionary
-              <input
-                type="file"
-                hidden
-                accept=".csv,.xlsx,.json"
-                onChange={handleFileUpload}
-              />
-            </Button>
-            <Button
-              variant="outlined"
-              component="label"
-              startIcon={<Input />}
-            >
-              Generate Inputs from prompt
-              <input
-                type="file"
-                hidden
-                accept=".csv,.xlsx,.json"
-                onChange={handleFileUpload}
-              />
-            </Button>
-            {dictionaryFile && (
-              <Typography variant="body2" sx={{ ml: 2 }}>
-                File selected: {dictionaryFile.name}
-              </Typography>
-            )}
           </Grid>
         </Grid>
         {renderInputs()}
@@ -336,4 +292,4 @@ const WebFuzzForgeDashboard = ({ token, setToken }) => {
   );
 };
 
-export default WebFuzzForgeDashboard;
+export default DictDashboard;
