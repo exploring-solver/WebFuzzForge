@@ -2,8 +2,8 @@ import { Container } from "@mui/material";
 
 const Dashboard = ({ token }) => {
     return (
-        <Container>
-            <h1>Welcome to the Dashboard</h1>
+        <Container className="flex justify-center items-center text-4xl">
+            <h1>Welcome to the Dashboard, please navigate to respective tools/services.</h1>
             {/* Add Report Generation component here */}
         </Container>
     );
